@@ -1,0 +1,98 @@
+from pyspark.sql.types import StructType, StructField, StringType, IntegerType, DoubleType, DateType
+from pyspark.sql import Row
+from datetime import datetime
+
+# Define schema
+sales_schema = StructType([
+    StructField("OrderID", StringType(), False),
+    StructField("OrderDate", DateType(), False),
+    StructField("Region", StringType(), True),
+    StructField("Product", StringType(), False),
+    StructField("Category", StringType(), False),
+    StructField("Price", DoubleType(), False),
+    StructField("Quantity", IntegerType(), False)
+])
+
+# Sample data
+sales_data = [
+    ("ORD009", datetime(2022, 1, 10), "West", "iPhone 15", "Electronics", 1099.99, 3),
+    ("ORD010", datetime(2022, 2, 18), "East", "MacBook Pro", "Electronics", 1999.99, 1),
+    ("ORD011", datetime(2022, 3, 6), "South", "Ergonomic Chair", "Furniture", 179.99, 2),
+    ("ORD012", datetime(2022, 4, 20), "North", "4K Monitor", "Electronics", 329.99, 2),
+    ("ORD013", datetime(2022, 5, 27), "West", "Standing Desk", "Furniture", 499.99, 1),
+    ("ORD014", datetime(2022, 6, 15), "East", "iPad Pro", "Electronics", 899.99, 2),
+    ("ORD015", datetime(2022, 7, 23), "South", "Corner Bookshelf", "Furniture", 249.99, 3),
+    ("ORD016", datetime(2022, 8, 12), "North", "Laser Printer", "Electronics", 199.99, 1),
+    ("ORD001", datetime(2023, 1, 15), "West", "iPhone 14", "Electronics", 999.99, 2),
+    ("ORD002", datetime(2023, 2, 20), "East", "MacBook Air", "Electronics", 1199.49, 1),
+    ("ORD003", datetime(2023, 3, 5), "South", "Desk Chair", "Furniture", 149.99, 4),
+    ("ORD004", datetime(2023, 4, 17), "North", "Monitor", "Electronics", 249.99, 2),
+    ("ORD005", datetime(2023, 5, 30), "West", "Office Desk", "Furniture", 399.99, 1),
+    ("ORD006", datetime(2023, 6, 12), "East", "iPad", "Electronics", 499.99, 3),
+    ("ORD007", datetime(2023, 7, 25), "South", "Bookshelf", "Furniture", 199.99, 2),
+    ("ORD008", datetime(2023, 8, 8), "North", "Printer", "Electronics", 149.49, 1),
+]
+
+# Create DataFrame
+sales_df = spark.createDataFrame(data=sales_data, schema=sales_schema)
+
+
+
+................................
+
+# Data Transformation
+from pyspark.sql.functions import year, month, col, expr
+
+sales_transformed = (
+    sales_df.withColumn("Year", year(col("OrderDate")))
+            .withColumn("Month", month(col("OrderDate")))
+            .withColumn("SalesAmount", expr("Price * Quantity"))
+)
+
+
+
+
+.....................................
+
+# Aggregation
+
+sales_summary = (
+    sales_transformed.groupBy("Region", "Category")
+                     .sum("SalesAmount")
+                     .withColumnRenamed("sum(SalesAmount)", "TotalSales")
+                     .orderBy("Region", "Category")
+)
+
+sales_summary.display()
+
+
+.................................................
+
+# Save as Delta Table (overwrite mode)
+sales_transformed.write.format("delta").mode("overwrite").saveAsTable("<uc-schema-table-names>")
+
+.......................................
+
+
+Sales 2024
+    ("ORD009", datetime(2024, 1, 10), "West", "iPhone 15", "Electronics", 1099.99, 3),
+    ("ORD010", datetime(2024, 2, 18), "East", "MacBook Pro", "Electronics", 1999.99, 1),
+    ("ORD011", datetime(2024, 3, 6), "South", "Ergonomic Chair", "Furniture", 179.99, 2),
+    ("ORD012", datetime(2024, 4, 20), "North", "4K Monitor", "Electronics", 329.99, 2),
+    ("ORD013", datetime(2024, 5, 27), "West", "Standing Desk", "Furniture", 499.99, 1),
+    ("ORD014", datetime(2024, 6, 15), "East", "iPad Pro", "Electronics", 899.99, 2),
+    ("ORD015", datetime(2024, 7, 23), "South", "Corner Bookshelf", "Furniture", 249.99, 3),
+    ("ORD016", datetime(2024, 8, 12), "North", "Laser Printer", "Electronics", 199.99, 1),
+
+......................................................................................................
+Sales 2025
+data_2025 = [
+    ("ORD009", datetime(2025, 1, 10), "West", "iPhone 15", "Electronics", 1099.99, 3),
+    ("ORD010", datetime(2025, 2, 18), "East", "MacBook Pro", "Electronics", 1999.99, 1),
+    ("ORD011", datetime(2025, 3, 6), "South", "Ergonomic Chair", "Furniture", 179.99, 2),
+    ("ORD012", datetime(2025, 4, 20), "North", "4K Monitor", "Electronics", 329.99, 2),
+    ("ORD013", datetime(2025, 5, 27), "West", "Standing Desk", "Furniture", 499.99, 1),
+    ("ORD014", datetime(2025, 6, 15), "East", "iPad Pro", "Electronics", 899.99, 2),
+    ("ORD015", datetime(2025, 7, 23), "South", "Corner Bookshelf", "Furniture", 249.99, 3),
+    ("ORD016", datetime(2025, 8, 12), "North", "Laser Printer", "Electronics", 199.99, 1),
+]
