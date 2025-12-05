@@ -15,6 +15,9 @@
     - https://www.bmc.com/blogs/cap-theorem/
 2. https://researchcomputing.princeton.edu/faq/what-is-a-cluster
 
+3. Unity Catalog:
+    - https://youtu.be/pr_QWMqktKM
+
 ---
 
 ---
